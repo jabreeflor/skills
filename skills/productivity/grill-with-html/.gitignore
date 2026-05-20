@@ -1,0 +1,4 @@
+# Session scratch — written at runtime, not part of the skill.
+tmp/
+grill-questions.json
+grill-responses.json
