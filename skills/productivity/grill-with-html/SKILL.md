@@ -23,31 +23,17 @@ The form uses `server.py`, reads `grill-questions.json`, and writes
 1. Write 3-6 dependency-first questions to `grill-questions.json` next to
    `grill.html`. Include one recommendation and 2-3 options per question.
 
-2. Start the server and open `http://localhost:<port>/`:
+2. Start the server. It chooses a port and opens the page:
 
    ```sh
-   python3 "<skill-dir>/server.py" <port> &
+   python3 "<skill-dir>/server.py" &
    ```
 
-   Default to `8765`, or pick another open port. The page re-renders when
-   questions change.
+   The page re-renders when questions change.
 
 3. Before telling me anything, start one persistent Monitor on
    `grill-responses.json` mtime. It covers all rounds. Do not use a blocking
-   bash loop or ask me when I am done.
-
-   ```sh
-   cd "<skill-dir>"
-   prev=""
-   while true; do
-     cur=$(stat -f %m grill-responses.json 2>/dev/null ||
-       stat -c %Y grill-responses.json 2>/dev/null)
-     if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then
-       prev=$cur; echo "responses submitted: $(date)"
-     fi
-     sleep 1
-   done
-   ```
+   bash loop or ask me when I am done. Emit an event on every submission.
 
 4. Tell me to answer the page questions and click **Submit responses**.
 
