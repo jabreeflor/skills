@@ -1,39 +1,81 @@
 ---
 name: grill-with-html
-description: Grill the user on a plan or design, but run the interview through a local HTML page where they can type comments, paste or drag in images, and drop files into context. Use when the user wants to be grilled with a visual interview form, mentions "grill me with html", or wants to attach files/images to their answers.
+description: Run a grilling interview through a local HTML form. Use when the
+  user wants to be grilled with HTML, a visual interview form, or answers that
+  include comments, pasted images, dragged images, or dropped files.
 ---
 
 <what-to-do>
 
-Interview me relentlessly about every aspect of this plan until we reach shared understanding. Walk each branch of the design tree, resolving dependencies one by one. For each question, give your recommended answer. If a question can be answered by exploring the codebase, do that instead of asking.
+Interview me on a plan or design until we reach shared understanding.
 
-Run the interview through the local HTML form in this skill so I can type comments, paste/drag images, and drop files into context — not in chat.
+Ask dependency-first questions, branch through the design tree, and give your
+recommended answer for each question. If codebase exploration can answer a
+question, inspect the code instead of asking me.
+
+Run the interview through this skill's local HTML form, not chat.
 
 </what-to-do>
 
 <how-to-run>
 
-The form talks to a tiny local server (`server.py`): questions render on open, answers POST straight back, and you pick them up without asking me for a file.
+The HTML form uses `server.py`. It renders questions, accepts submissions, and
+writes answers to `grill-responses.json`.
 
-1. **Write the first questions** to `grill-questions.json` next to `grill.html` (format below). Include only this round — start with 3-6, dependencies first. Give each a recommended answer and 2-3 options.
+1. Write the first round to `grill-questions.json` next to `grill.html`.
+   Include 3-6 dependency-first questions. Give each a recommendation and
+   2-3 options.
 
-2. **Start the server and open it.** `python3 "<skill-dir>/server.py" <port> &` (default 8765; pick another if taken), then open `http://localhost:<port>/`. The page re-renders automatically whenever you overwrite `grill-questions.json`.
+2. Start the server:
 
-3. **Arm the persistent Monitor immediately, before telling me anything.** Start **one** persistent `Monitor` that emits an event on every submission by watching the responses file's mtime. It covers all rounds, so you never re-arm. Do **not** use a blocking bash loop or ask me when I'm done.
-
+   ```sh
+   python3 "<skill-dir>/server.py" <port> &
    ```
-   cd "<skill-dir>"; prev=""; while true; do cur=$(stat -f %m grill-responses.json 2>/dev/null || stat -c %Y grill-responses.json 2>/dev/null); if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then prev=$cur; echo "responses submitted: $(date)"; fi; sleep 1; done
+
+   Default to port `8765`; choose another if it is taken. Open
+   `http://localhost:<port>/`. The page re-renders when
+   `grill-questions.json` changes.
+
+3. Before telling me anything, start one persistent Monitor. It should watch
+   `grill-responses.json` mtime and emit an event on every submission.
+
+   Do not use a blocking bash loop. Do not ask me when I am done. One Monitor
+   covers all rounds.
+
+   ```sh
+   cd "<skill-dir>"
+   prev=""
+   while true; do
+     cur=$(stat -f %m grill-responses.json 2>/dev/null ||
+       stat -c %Y grill-responses.json 2>/dev/null)
+     if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then
+       prev=$cur
+       echo "responses submitted: $(date)"
+     fi
+     sleep 1
+   done
    ```
 
-4. **Tell me what to do:** answer the questions (each card has a comment box and a file/image drop zone), then click **Submit responses**.
+4. Tell me to answer the page questions and click **Submit responses**.
+   Each card has a comment box and a file/image drop zone.
 
-5. **On each Monitor event, read `grill-responses.json`** — my selected option, comment, and any attached files (images as data URLs, text inline).
+5. On each Monitor event, read `grill-responses.json`. Use my selected option,
+   comment, and attached files. Images arrive as data URLs; text files arrive
+   inline.
 
-6. **Continue.** Resolve that branch, overwrite `grill-questions.json` (auto re-renders), wait for the next event. Repeat until shared understanding.
+6. Continue round by round. Resolve the current branch, overwrite
+   `grill-questions.json`, then wait for the next Monitor event.
 
-7. **Finish.** Write `{"done": true, "message": "…summary…"}` to `grill-questions.json` for a completion screen, then stop the Monitor with `TaskStop`.
+7. Finish by writing this to `grill-questions.json`, then stop the Monitor with
+   `TaskStop`:
 
-Each round is archived by the server to `tmp/session-<timestamp>/` as `round-N-questions.json` / `round-N-responses.json`. `tmp/` and the working `grill-*.json` files are gitignored.
+   ```json
+   { "done": true, "message": "...summary..." }
+   ```
+
+The server archives each round under `tmp/session-<timestamp>/` as
+`round-N-questions.json` and `round-N-responses.json`. `tmp/` and the working
+`grill-*.json` files are gitignored.
 
 </how-to-run>
 
@@ -48,7 +90,7 @@ Each round is archived by the server to `tmp/session-<timestamp>/` as `round-N-q
     {
       "id": 1,
       "question": "The question text.",
-      "recommendation": "Your recommended answer and the one-sentence trade-off.",
+      "recommendation": "Recommended answer and one-sentence trade-off.",
       "options": ["Recommended option", "Alternative A", "Alternative B"],
       "svg": "<svg xmlns='http://www.w3.org/2000/svg' ...>...</svg>"
     }
@@ -56,7 +98,17 @@ Each round is archived by the server to `tmp/session-<timestamp>/` as `round-N-q
 }
 ```
 
-Each option is a string (a chip) **or** an object `{ "label": "...", "svg": "<svg…>" }`. When options carry `svg`, the form renders a grid of selectable diagram cards — use 3-4 visual choices when the decision needs them (nav patterns, layouts). A question's top-level `svg` (shared context) can coexist with per-option thumbnails. Use a `viewBox` (no fixed width/height) on option SVGs so they scale.
+Options can be strings or objects:
+
+```json
+{ "label": "Option label", "svg": "<svg...>" }
+```
+
+Use option SVGs for visual choices such as layouts, navigation patterns, and
+system structures. Use 3-4 visual options when a decision benefits from
+comparison. A question-level `svg` can coexist with option SVGs.
+
+For option SVGs, use a `viewBox` and no fixed `width` or `height`.
 
 `grill-responses.json` (form writes, you read):
 
@@ -70,34 +122,62 @@ Each option is a string (a chip) **or** an object `{ "label": "...", "svg": "<sv
       "choice": "Alternative A",
       "comment": "Free-text notes.",
       "files": [
-        { "name": "diagram.png", "type": "image/png", "dataUrl": "data:image/png;base64,..." },
-        { "name": "schema.sql", "type": "text/plain", "text": "create table ..." }
+        {
+          "name": "diagram.png",
+          "type": "image/png",
+          "dataUrl": "data:image/png;base64,..."
+        },
+        {
+          "name": "schema.sql",
+          "type": "text/plain",
+          "text": "create table ..."
+        }
       ]
     }
   ]
 }
 ```
 
-**Diagrams (optional `svg`):** include one when a question is about a design (architecture, data flow, layout, comparing structures). Author it yourself, self-contained — no external `<image href>` or remote fonts. It renders via an `<img>` data URL, so embedded scripts won't run. Use a light background with dark strokes/text. Skip it for yes/no or terminology questions.
+**Diagrams**
 
-Keep diagrams clean, not clipped:
-- **Size every box to its text** (~0.55em per char at the font-size, plus padding) — a `text-anchor='middle'` label wider than its `rect` gets clipped. When unsure, go bigger or shorten the label.
-- Set explicit `width`/`height` on the `<svg>`; keep all shapes inside it.
-- With `text-anchor='middle'`, `x` = box center (`rect.x + width/2`), `y` ≈ box vertical-center + a third of the font-size.
-- One label per `<text>` line; stack overflow words. Stop arrows just short of their target box. Avoid font-size below 11.
+Add optional `svg` when a question concerns architecture, data flow, layouts,
+or structural comparisons. Skip diagrams for yes/no or terminology questions.
 
-Example (boxes wider than text, arrow stopping short):
+SVG rules:
 
-```
-<svg xmlns='http://www.w3.org/2000/svg' width='560' height='90' font-family='system-ui' font-size='13'>
-  <defs><marker id='a' markerWidth='9' markerHeight='9' refX='7' refY='3' orient='auto'>
-    <path d='M0,0 L6,3 L0,6 z' fill='#666'/></marker></defs>
-  <rect x='10' y='12' width='130' height='46' rx='6' fill='#eef' stroke='#447'/>
+- Keep SVGs self-contained. Do not use remote fonts, scripts, or external
+  `<image href>` values.
+- Use a light background with dark strokes and text.
+- Set explicit `width` and `height` on question-level SVGs.
+- Keep all shapes inside the SVG bounds.
+- Size boxes to their text. Use about `0.55em` per character plus padding.
+- With centered text, set `x` to the box center and `y` near vertical center
+  plus one third of the font size.
+- Use one label per `<text>` line. Stack overflow words.
+- Stop arrows just before their target box.
+- Avoid font sizes below `11`.
+
+Example:
+
+```svg
+<svg xmlns='http://www.w3.org/2000/svg'
+  width='560' height='90' font-family='system-ui' font-size='13'>
+  <defs>
+    <marker id='a' markerWidth='9' markerHeight='9'
+      refX='7' refY='3' orient='auto'>
+      <path d='M0,0 L6,3 L0,6 z' fill='#666'/>
+    </marker>
+  </defs>
+  <rect x='10' y='12' width='130' height='46'
+    rx='6' fill='#eef' stroke='#447'/>
   <text x='75' y='40' text-anchor='middle'>description</text>
-  <rect x='215' y='12' width='130' height='46' rx='6' fill='#efe' stroke='#474'/>
+  <rect x='215' y='12' width='130' height='46'
+    rx='6' fill='#efe' stroke='#474'/>
   <text x='280' y='35' text-anchor='middle'>write-skill</text>
-  <text x='280' y='51' text-anchor='middle' font-size='11'>(clarify + gen)</text>
-  <line x1='140' y1='35' x2='213' y2='35' stroke='#666' marker-end='url(#a)'/>
+  <text x='280' y='51' text-anchor='middle'
+    font-size='11'>(clarify + gen)</text>
+  <line x1='140' y1='35' x2='213' y2='35'
+    stroke='#666' marker-end='url(#a)'/>
 </svg>
 ```
 
