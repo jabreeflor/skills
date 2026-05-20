@@ -6,106 +6,35 @@
 <title>Grill Me</title>
 <style>
   :root { color-scheme: light dark; }
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 24px 16px 96px;
-    line-height: 1.5;
-  }
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 760px; margin: 0 auto; padding: 24px 16px 96px; line-height: 1.5; }
   h1 { margin: 0 0 4px; }
   .muted { opacity: 0.65; font-size: 0.9em; }
-  .card {
-    border: 1px solid rgba(127,127,127,0.4);
-    border-radius: 10px;
-    padding: 16px;
-    margin: 16px 0;
-  }
+  .card { border: 1px solid rgba(127,127,127,0.4); border-radius: 10px; padding: 16px; margin: 16px 0; }
   .question { font-weight: 600; margin-bottom: 6px; }
   .rec { font-size: 0.9em; opacity: 0.8; margin-bottom: 12px; }
-  .diagram {
-    display: block;
-    max-width: 100%;
-    margin: 0 0 12px;
-    border: 1px solid rgba(127,127,127,0.3);
-    border-radius: 8px;
-    background: #fff;
-  }
+  .diagram { display: block; max-width: 100%; margin: 0 0 12px; border: 1px solid rgba(127,127,127,0.3); border-radius: 8px; background: #fff; }
   .options { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-  .options button {
-    border: 1px solid rgba(127,127,127,0.5);
-    background: transparent;
-    color: inherit;
-    border-radius: 999px;
-    padding: 6px 14px;
-    cursor: pointer;
-    font: inherit;
-  }
+  .options button { border: 1px solid rgba(127,127,127,0.5); background: transparent; color: inherit; border-radius: 999px; padding: 6px 14px; cursor: pointer; font: inherit; }
   .options button.selected { background: #2d7ff9; color: #fff; border-color: #2d7ff9; }
-  .option-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-  .option-card {
-    border: 2px solid rgba(127,127,127,0.4);
-    border-radius: 8px;
-    padding: 8px;
-    cursor: pointer;
-    background: #fff;
-    transition: border-color 0.15s;
-  }
+  .option-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-bottom: 12px; }
+  .option-card { border: 2px solid rgba(127,127,127,0.4); border-radius: 8px; padding: 8px; cursor: pointer; background: #fff; transition: border-color 0.15s; }
   .option-card:hover { border-color: #8bb4f5; }
   .option-card.selected { border-color: #2d7ff9; box-shadow: 0 0 0 1px #2d7ff9; }
   .option-card img { display: block; width: 100%; height: auto; border-radius: 4px; }
   .option-card-label { margin-top: 6px; text-align: center; font-weight: 600; color: #222; }
-  textarea {
-    width: 100%;
-    box-sizing: border-box;
-    min-height: 64px;
-    font: inherit;
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid rgba(127,127,127,0.5);
-    background: transparent;
-    color: inherit;
-    resize: vertical;
-  }
-  .files {
-    margin-top: 10px;
-    border: 1px dashed rgba(127,127,127,0.5);
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 0.9em;
-  }
+  textarea { width: 100%; box-sizing: border-box; min-height: 64px; font: inherit; padding: 8px; border-radius: 8px; border: 1px solid rgba(127,127,127,0.5); background: transparent; color: inherit; resize: vertical; }
+  .files { margin-top: 10px; border: 1px dashed rgba(127,127,127,0.5); border-radius: 8px; padding: 10px; font-size: 0.9em; }
   .files.over { background: rgba(45,127,249,0.12); }
   .files .hint { opacity: 0.6; }
   .attachment { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
   .attachment img { max-height: 48px; border-radius: 4px; }
   .attachment button { margin-left: auto; cursor: pointer; }
-  #export {
-    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
-    background: #2d7ff9; color: #fff; border: none; border-radius: 999px;
-    padding: 12px 28px; font: inherit; font-weight: 600; cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-  }
+  #export { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: #2d7ff9; color: #fff; border: none; border-radius: 999px; padding: 12px 28px; font: inherit; font-weight: 600; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.25); }
   #export[disabled] { opacity: 0.4; cursor: not-allowed; }
   #export[hidden] { display: none; }
-  .center-msg {
-    text-align: center;
-    padding: 48px 16px;
-    opacity: 0.85;
-  }
+  .center-msg { text-align: center; padding: 48px 16px; opacity: 0.85; }
   .center-msg .big { font-size: 1.2em; font-weight: 600; margin-top: 12px; }
-  .spinner {
-    width: 32px; height: 32px;
-    margin: 0 auto;
-    border: 3px solid rgba(127,127,127,0.3);
-    border-top-color: #2d7ff9;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
+  .spinner { width: 32px; height: 32px; margin: 0 auto; border: 3px solid rgba(127,127,127,0.3); border-top-color: #2d7ff9; border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .checkmark { font-size: 40px; color: #2d9f5a; }
 </style>
@@ -113,104 +42,65 @@
 <body>
   <h1>Grill Me</h1>
   <p class="muted">Answer each question, attach files or paste images, then submit your responses.</p>
-
   <h2 id="topic"></h2>
   <div id="questions"></div>
-
   <button id="export" disabled>Submit responses</button>
 
 <script>
 let topic = "";
-const state = []; // { id, question, choice, comment, files: [], recommendation, options }
-
+const state = []; // { id, question, choice, comment, files, recommendation, svg, options }
 const exportBtn = document.getElementById("export");
-
 const questionsEl = document.getElementById("questions");
 
 function applyData(data) {
   topic = data.topic || "";
   document.getElementById("topic").textContent = topic;
   state.length = 0;
-
-  // The agent signals the grilling is over with {"done": true}.
-  if (data.done) {
-    showDone(data.message || "All done — we've reached shared understanding.");
-    return;
-  }
-
+  if (data.done) return showDone(data.message || "All done — we've reached shared understanding.");
   (data.questions || []).forEach(q => state.push({
     id: q.id, question: q.question, choice: "", comment: "", files: [],
     recommendation: q.recommendation || "", svg: q.svg || "",
     options: (q.options || []).map(o => typeof o === "string" ? { label: o } : { label: o.label, svg: o.svg || "" })
   }));
-  setStatus("");
   render();
   exportBtn.hidden = false;
   exportBtn.disabled = state.length === 0;
 }
 
-function showWaiting() {
+function centerMsg(iconClass, iconText, message) {
+  document.getElementById("topic").textContent = topic;
   questionsEl.replaceChildren();
   const box = document.createElement("div");
   box.className = "center-msg";
-  const sp = document.createElement("div");
-  sp.className = "spinner";
+  const icon = document.createElement("div");
+  icon.className = iconClass;
+  icon.textContent = iconText;
   const msg = document.createElement("div");
   msg.className = "big";
-  msg.textContent = "Submitted — waiting for the next round…";
-  box.append(sp, msg);
+  msg.textContent = message;
+  box.append(icon, msg);
   questionsEl.appendChild(box);
   exportBtn.hidden = true;
 }
 
-function showDone(text) {
-  document.getElementById("topic").textContent = "";
-  questionsEl.replaceChildren();
-  const box = document.createElement("div");
-  box.className = "center-msg";
-  const check = document.createElement("div");
-  check.className = "checkmark";
-  check.textContent = "✓";
-  const msg = document.createElement("div");
-  msg.className = "big";
-  msg.textContent = text;
-  box.append(check, msg);
-  questionsEl.appendChild(box);
-  exportBtn.hidden = true;
-}
+const showWaiting = () => centerMsg("spinner", "", "Submitted — waiting for the next round…");
+function showDone(text) { topic = ""; centerMsg("checkmark", "✓", text); }
 
-// Poll the server for the current questions; re-render only when they change.
+// Poll the server; re-render only when the questions actually change.
 let lastQuestions = "";
-
 async function poll() {
   try {
     const res = await fetch("questions.json", { cache: "no-store" });
     if (!res.ok) return;
     const text = await res.text();
-    if (text !== lastQuestions) {   // a genuinely new round (or done signal) arrived
-      lastQuestions = text;
-      applyData(JSON.parse(text));
-    }
-  } catch (_) { /* server momentarily unreachable — try again next tick */ }
+    if (text !== lastQuestions) { lastQuestions = text; applyData(JSON.parse(text)); }
+  } catch (_) {}
 }
-
-function setStatus(msg) {
-  let el = document.getElementById("status");
-  if (!el) {
-    el = document.createElement("p");
-    el.id = "status";
-    el.className = "muted";
-    exportBtn.insertAdjacentElement("beforebegin", el);
-  }
-  el.textContent = msg;
-}
-
 poll();
 setInterval(poll, 2000);
 
 function render() {
-  const container = document.getElementById("questions");
-  container.replaceChildren();
+  questionsEl.replaceChildren();
   state.forEach((q, i) => {
     const card = document.createElement("div");
     card.className = "card";
@@ -227,15 +117,7 @@ function render() {
       card.appendChild(rec);
     }
 
-    if (q.svg) {
-      // Agent-authored diagram. Rendered via <img> data URL so any embedded
-      // script can't execute, and we never set innerHTML with markup.
-      const img = document.createElement("img");
-      img.className = "diagram";
-      img.alt = "diagram";
-      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(q.svg);
-      card.appendChild(img);
-    }
+    if (q.svg) card.appendChild(svgImg(q.svg, "diagram", "diagram"));
 
     const hasDiagrams = q.options.some(o => o.svg);
     const opts = document.createElement("div");
@@ -243,17 +125,13 @@ function render() {
     q.options.forEach(opt => {
       const select = () => { q.choice = (q.choice === opt.label) ? "" : opt.label; render(); };
       if (opt.svg) {
-        // Per-option diagram: a selectable card with the SVG thumbnail + label.
         const c = document.createElement("div");
         c.className = "option-card" + (q.choice === opt.label ? " selected" : "");
         c.onclick = select;
-        const img = document.createElement("img");
-        img.alt = opt.label;
-        img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(opt.svg);
         const cap = document.createElement("div");
         cap.className = "option-card-label";
         cap.textContent = opt.label;
-        c.append(img, cap);
+        c.append(svgImg(opt.svg, "", opt.label), cap);
         opts.appendChild(c);
       } else {
         const b = document.createElement("button");
@@ -278,7 +156,6 @@ function render() {
     hint.textContent = "Drop or paste files / images here";
     files.appendChild(hint);
     q.files.forEach((f, fi) => files.appendChild(attachmentRow(q, fi)));
-
     files.addEventListener("dragover", e => { e.preventDefault(); files.classList.add("over"); });
     files.addEventListener("dragleave", () => files.classList.remove("over"));
     files.addEventListener("drop", e => {
@@ -287,14 +164,21 @@ function render() {
       [...e.dataTransfer.files].forEach(file => addFile(q, file));
     });
     ta.addEventListener("paste", e => {
-      [...e.clipboardData.items].forEach(item => {
-        if (item.kind === "file") addFile(q, item.getAsFile());
-      });
+      [...e.clipboardData.items].forEach(item => { if (item.kind === "file") addFile(q, item.getAsFile()); });
     });
     card.appendChild(files);
 
-    container.appendChild(card);
+    questionsEl.appendChild(card);
   });
+}
+
+// SVG via <img> data URL so embedded scripts can't run.
+function svgImg(svg, className, alt) {
+  const img = document.createElement("img");
+  if (className) img.className = className;
+  img.alt = alt;
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  return img;
 }
 
 function attachmentRow(q, fi) {
@@ -321,40 +205,24 @@ function addFile(q, file) {
   const isText = file.type.startsWith("text/") || /\.(md|txt|json|csv|ya?ml|js|ts|py|sql|sh|html?|css)$/i.test(file.name);
   reader.onload = () => {
     const entry = { name: file.name, type: file.type || "application/octet-stream" };
-    if (isText) entry.text = reader.result;
-    else entry.dataUrl = reader.result;
+    if (isText) entry.text = reader.result; else entry.dataUrl = reader.result;
     q.files.push(entry);
     render();
   };
-  if (isText) reader.readAsText(file);
-  else reader.readAsDataURL(file);
+  if (isText) reader.readAsText(file); else reader.readAsDataURL(file);
 }
 
 exportBtn.onclick = async () => {
   const out = {
     topic,
-    responses: state.map(q => ({
-      id: q.id,
-      question: q.question,
-      choice: q.choice,
-      comment: q.comment,
-      files: q.files
-    }))
+    responses: state.map(q => ({ id: q.id, question: q.question, choice: q.choice, comment: q.comment, files: q.files }))
   };
-
   exportBtn.disabled = true;
   try {
-    await fetch("responses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(out)
-    });
-    // Keep lastQuestions as-is so poll only swaps in a genuinely new round;
-    // until then we show the waiting spinner.
-    showWaiting();
+    await fetch("responses", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(out) });
+    showWaiting(); // keep lastQuestions so poll only swaps in a genuinely new round
   } catch (_) {
     exportBtn.disabled = false;
-    setStatus("Couldn't reach the server — is it still running?");
   }
 };
 </script>

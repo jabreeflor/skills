@@ -1,29 +1,17 @@
 #!/usr/bin/env python3
-"""Tiny local server for grill-with-html.
-
-Serves grill.html and the current questions, and accepts posted answers so the
-agent can pick them up automatically. Stdlib only.
+"""Tiny local server for grill-with-html (stdlib only).
 
   GET  /                -> grill.html
-  GET  /questions.json  -> current questions (written by the agent)
+  GET  /questions.json  -> grill-questions.json (written by the agent)
   POST /responses       -> writes grill-responses.json (read by the agent)
 
-Run from the directory holding grill.html. Files are read/written there.
+Run from the directory holding grill.html. Each round is archived under tmp/.
 """
-import datetime
-import http.server
-import json
-import os
-import shutil
-import sys
+import datetime, http.server, json, os, shutil, sys
 
 DIR = os.path.dirname(os.path.abspath(__file__))
 PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
-
-# Per-session cache: every round's questions + answers are archived here.
-SESSION = os.path.join(
-    DIR, "tmp", "session-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-)
+SESSION = os.path.join(DIR, "tmp", "session-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 os.makedirs(SESSION, exist_ok=True)
 _round = 0
 
@@ -42,8 +30,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def _serve_questions(self):
         path = os.path.join(DIR, "grill-questions.json")
         if not os.path.exists(path):
-            self.send_error(404, "no questions yet")
-            return
+            return self.send_error(404, "no questions yet")
         with open(path, "rb") as f:
             body = f.read()
         self.send_response(200)
@@ -55,21 +42,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if self.path != "/responses":
-            self.send_error(404)
-            return
-        length = int(self.headers.get("Content-Length", 0))
-        raw = self.rfile.read(length)
+            return self.send_error(404)
+        raw = self.rfile.read(int(self.headers.get("Content-Length", 0)))
         try:
             data = json.loads(raw)
         except json.JSONDecodeError:
-            self.send_error(400, "invalid JSON")
-            return
-        # Canonical file the agent's Monitor watches.
-        out = os.path.join(DIR, "grill-responses.json")
-        with open(out, "w") as f:
-            json.dump(data, f, indent=2)
+            return self.send_error(400, "invalid JSON")
 
-        # Archive this round (questions + answers) into the session cache.
+        with open(os.path.join(DIR, "grill-responses.json"), "w") as f:
+            json.dump(data, f, indent=2)  # canonical file the Monitor watches
+
         global _round
         _round += 1
         questions = os.path.join(DIR, "grill-questions.json")
@@ -84,7 +66,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.wfile.write(b'{"ok":true}')
 
     def log_message(self, *a):
-        pass  # quiet
+        pass
 
 
 if __name__ == "__main__":
