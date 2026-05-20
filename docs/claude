@@ -1,0 +1,38 @@
+# Claude Documentation Links
+
+## Core Claude Code
+
+- Claude Code overview: https://docs.anthropic.com/en/docs/claude-code/overview
+- Claude Code docs index: https://code.claude.com/docs/en/overview
+- Claude Code best practices: https://code.claude.com/docs/en/best-practices
+- Claude Code settings: https://code.claude.com/docs/en/settings
+- Claude Code memory: https://code.claude.com/docs/en/memory
+
+## Skills
+
+- Claude Code skills: https://docs.claude.com/en/docs/claude-code/skills
+- Agent Skills: https://docs.claude.com/en/docs/agents-and-tools/agent-skills
+- Use Skills in Claude: https://support.claude.com/en/articles/12512180-using-skills-in-claude
+- Complete guide to building Skills for Claude: https://resources.anthropic.com/hubfs/The-Complete-Guide-to-Building-Skill-for-Claude.pdf
+
+## Plugins
+
+- Claude Code plugins: https://code.claude.com/docs/en/plugins
+- Claude plugins overview: https://claude.com/docs/plugins/overview
+- Plugin Developer Toolkit: https://claude.com/plugins/plugin-dev
+- Claude plugins docs index: https://claude.com/docs/llms.txt
+
+## Subagents, Hooks, And MCP
+
+- Claude Code subagents: https://code.claude.com/docs/en/subagents
+- Anthropic subagents reference: https://docs.anthropic.com/en/docs/claude-code/sub-agents
+- Claude Code hooks: https://docs.anthropic.com/en/docs/claude-code/hooks
+- Claude Code MCP: https://code.claude.com/docs/en/mcp
+- Model Context Protocol docs: https://modelcontextprotocol.io/docs
+
+## Best Practices And Advanced Patterns
+
+- Claude Code common workflows: https://code.claude.com/docs/en/common-workflows
+- Claude Code troubleshooting: https://code.claude.com/docs/en/troubleshooting
+- Claude Code Advanced Patterns PDF: https://resources.anthropic.com/hubfs/Claude%20Code%20Advanced%20Patterns_%20Subagents%2C%20MCP%2C%20and%20Scaling%20to%20Real%20Codebases.pdf
+

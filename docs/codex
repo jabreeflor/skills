@@ -1,0 +1,31 @@
+# Codex Documentation Links
+
+## Core Codex
+
+- Codex product page: https://openai.com/codex/
+- Codex developer hub: https://developers.openai.com/codex/
+- Codex use cases: https://developers.openai.com/codex/use-cases/
+- OpenAI Codex CLI GitHub repository: https://github.com/openai/codex
+- OpenAI Codex CLI getting started: https://help.openai.com/en/articles/11096431-openai-codex-cli-getting-started
+
+## Skills And Plugins
+
+- Plugins and skills in Codex: https://openai.com/academy/codex-plugins-and-skills/
+- Skills in ChatGPT, Codex, and the API: https://help.openai.com/articles/20001066-skills-in-chatgpt/
+- Introducing the Codex app, including skills: https://openai.com/index/introducing-the-codex-app/
+- Codex app workflows and plugins overview: https://openai.com/academy/working-with-codex/
+
+## OpenAI Agent And App Building
+
+- OpenAI developer docs: https://platform.openai.com/docs
+- OpenAI Agents SDK: https://openai.github.io/openai-agents-python/
+- OpenAI Apps SDK: https://developers.openai.com/apps-sdk/
+- Model Context Protocol in the Apps SDK: https://developers.openai.com/apps-sdk/concepts/mcp/
+
+## Best Practices And Examples
+
+- Codex for almost everything: https://developers.openai.com/resources/codex-for-almost-everything/
+- Using skills to accelerate OSS maintenance: https://developers.openai.com/resources/using-skills-to-accelerate-oss-maintenance/
+- Testing agent skills systematically with evals: https://developers.openai.com/resources/testing-agent-skills-systematically-with-evals/
+- Run long horizon tasks with Codex: https://developers.openai.com/resources/run-long-horizon-tasks-with-codex/
+
