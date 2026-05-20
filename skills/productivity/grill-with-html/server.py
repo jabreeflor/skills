@@ -7,10 +7,10 @@
 
 Run from the directory holding grill.html. Each round is archived under tmp/.
 """
-import datetime, http.server, json, os, shutil, sys
+import datetime, http.server, json, os, shutil, sys, webbrowser
 
 DIR = os.path.dirname(os.path.abspath(__file__))
-PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
+REQUESTED_PORT = int(sys.argv[1]) if len(sys.argv) > 1 else 8765
 SESSION = os.path.join(DIR, "tmp", "session-" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"))
 os.makedirs(SESSION, exist_ok=True)
 _round = 0
@@ -70,6 +70,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"grill server on http://localhost:{PORT} (serving {DIR})")
+    try:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", REQUESTED_PORT), Handler)
+    except OSError:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    port = server.server_address[1]
+    url = f"http://localhost:{port}/"
+    print(f"grill server on {url} (serving {DIR})")
     print(f"session cache: {SESSION}")
-    http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    webbrowser.open(url)
+    server.serve_forever()

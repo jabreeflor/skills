@@ -23,13 +23,7 @@ The form uses `server.py`, reads `grill-questions.json`, and writes
 1. Write 3-6 dependency-first questions to `grill-questions.json` next to
    `grill.html`. Include one recommendation and 2-3 options per question.
 
-2. Start the server and open `http://localhost:<port>/`:
-
-   ```sh
-   python3 "<skill-dir>/server.py" <port> &
-   ```
-
-   Default to `8765`, or pick another open port. The page re-renders when
+2. Start `server.py`. It chooses a port, opens the page, and re-renders when
    questions change.
 
 3. Before telling me anything, start one persistent Monitor on
