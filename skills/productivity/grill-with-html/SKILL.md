@@ -1,184 +1,71 @@
 ---
 name: grill-with-html
-description: Run a grilling interview through a local HTML form. Use when the
-  user wants to be grilled with HTML, a visual interview form, or answers that
-  include comments, pasted images, dragged images, or dropped files.
+description: Run a grilling interview in a local HTML form when the user wants
+  visual questions, comments, pasted images, dragged images, or dropped files.
 ---
 
 <what-to-do>
 
-Interview me on a plan or design until we reach shared understanding.
+Interview me on a plan or design until we reach shared understanding. Ask
+dependency-first questions, branch through the design tree, and recommend an
+answer for each question. If code inspection can answer something, do that
+instead of asking.
 
-Ask dependency-first questions, branch through the design tree, and give your
-recommended answer for each question. If codebase exploration can answer a
-question, inspect the code instead of asking me.
-
-Run the interview through this skill's local HTML form, not chat.
+Use this skill's HTML form for the interview, not chat.
 
 </what-to-do>
 
 <how-to-run>
 
-The HTML form uses `server.py`. It renders questions, accepts submissions, and
-writes answers to `grill-responses.json`.
+The form uses `server.py`, reads `grill-questions.json`, and writes
+`grill-responses.json`.
 
-1. Write the first round to `grill-questions.json` next to `grill.html`.
-   Include 3-6 dependency-first questions. Give each a recommendation and
-   2-3 options.
+1. Write 3-6 dependency-first questions to `grill-questions.json` next to
+   `grill.html`. Include one recommendation and 2-3 options per question.
 
-2. Start the server:
+2. Start the server and open `http://localhost:<port>/`:
 
    ```sh
    python3 "<skill-dir>/server.py" <port> &
    ```
 
-   Default to port `8765`; choose another if it is taken. Open
-   `http://localhost:<port>/`. The page re-renders when
-   `grill-questions.json` changes.
+   Default to `8765`, or pick another open port. The page re-renders when
+   questions change.
 
-3. Before telling me anything, start one persistent Monitor. It should watch
-   `grill-responses.json` mtime and emit an event on every submission.
-
-   Do not use a blocking bash loop. Do not ask me when I am done. One Monitor
-   covers all rounds.
-
-   ```sh
-   cd "<skill-dir>"
-   prev=""
-   while true; do
-     cur=$(stat -f %m grill-responses.json 2>/dev/null ||
-       stat -c %Y grill-responses.json 2>/dev/null)
-     if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then
-       prev=$cur
-       echo "responses submitted: $(date)"
-     fi
-     sleep 1
-   done
-   ```
+3. Before telling me anything, start one persistent Monitor on
+   `grill-responses.json` mtime. It covers all rounds. Do not use a blocking
+   bash loop or ask me when I am done. Emit an event on every submission.
 
 4. Tell me to answer the page questions and click **Submit responses**.
-   Each card has a comment box and a file/image drop zone.
 
-5. On each Monitor event, read `grill-responses.json`. Use my selected option,
-   comment, and attached files. Images arrive as data URLs; text files arrive
-   inline.
+5. On each Monitor event, read `grill-responses.json`, use the answers and
+   attachments, then overwrite `grill-questions.json` for the next round.
 
-6. Continue round by round. Resolve the current branch, overwrite
-   `grill-questions.json`, then wait for the next Monitor event.
+6. Finish with `{ "done": true, "message": "...summary..." }` in
+   `grill-questions.json`, then stop the Monitor with `TaskStop`.
 
-7. Finish by writing this to `grill-questions.json`, then stop the Monitor with
-   `TaskStop`:
-
-   ```json
-   { "done": true, "message": "...summary..." }
-   ```
-
-The server archives each round under `tmp/session-<timestamp>/` as
-`round-N-questions.json` and `round-N-responses.json`. `tmp/` and the working
-`grill-*.json` files are gitignored.
+The server archives rounds under `tmp/session-<timestamp>/`. `tmp/` and
+`grill-*.json` are gitignored.
 
 </how-to-run>
 
 <data-format>
 
-`grill-questions.json` (you write):
+Write `grill-questions.json` with `topic` and `questions`. Each question has
+`id`, `question`, `recommendation`, `options`, and optional `svg`.
 
-```json
-{
-  "topic": "Short title",
-  "questions": [
-    {
-      "id": 1,
-      "question": "The question text.",
-      "recommendation": "Recommended answer and one-sentence trade-off.",
-      "options": ["Recommended option", "Alternative A", "Alternative B"],
-      "svg": "<svg xmlns='http://www.w3.org/2000/svg' ...>...</svg>"
-    }
-  ]
-}
-```
+Options can also be `{ "label": "Option label", "svg": "<svg...>" }`.
+Use option SVGs for visual choices. Give option SVGs a `viewBox` and no fixed
+`width` or `height`. Question-level SVGs can coexist with option SVGs.
 
-Options can be strings or objects:
+Read `grill-responses.json` for `topic` and `responses`. Each response has
+`id`, `question`, `choice`, `comment`, and `files`. Files include `name`,
+`type`, and either `dataUrl` for images or `text` for text files.
 
-```json
-{ "label": "Option label", "svg": "<svg...>" }
-```
-
-Use option SVGs for visual choices such as layouts, navigation patterns, and
-system structures. Use 3-4 visual options when a decision benefits from
-comparison. A question-level `svg` can coexist with option SVGs.
-
-For option SVGs, use a `viewBox` and no fixed `width` or `height`.
-
-`grill-responses.json` (form writes, you read):
-
-```json
-{
-  "topic": "Short title",
-  "responses": [
-    {
-      "id": 1,
-      "question": "The question text.",
-      "choice": "Alternative A",
-      "comment": "Free-text notes.",
-      "files": [
-        {
-          "name": "diagram.png",
-          "type": "image/png",
-          "dataUrl": "data:image/png;base64,..."
-        },
-        {
-          "name": "schema.sql",
-          "type": "text/plain",
-          "text": "create table ..."
-        }
-      ]
-    }
-  ]
-}
-```
-
-**Diagrams**
-
-Add optional `svg` when a question concerns architecture, data flow, layouts,
-or structural comparisons. Skip diagrams for yes/no or terminology questions.
-
-SVG rules:
-
-- Keep SVGs self-contained. Do not use remote fonts, scripts, or external
-  `<image href>` values.
-- Use a light background with dark strokes and text.
-- Set explicit `width` and `height` on question-level SVGs.
-- Keep all shapes inside the SVG bounds.
-- Size boxes to their text. Use about `0.55em` per character plus padding.
-- With centered text, set `x` to the box center and `y` near vertical center
-  plus one third of the font size.
-- Use one label per `<text>` line. Stack overflow words.
-- Stop arrows just before their target box.
-- Avoid font sizes below `11`.
-
-Example:
-
-```svg
-<svg xmlns='http://www.w3.org/2000/svg'
-  width='560' height='90' font-family='system-ui' font-size='13'>
-  <defs>
-    <marker id='a' markerWidth='9' markerHeight='9'
-      refX='7' refY='3' orient='auto'>
-      <path d='M0,0 L6,3 L0,6 z' fill='#666'/>
-    </marker>
-  </defs>
-  <rect x='10' y='12' width='130' height='46'
-    rx='6' fill='#eef' stroke='#447'/>
-  <text x='75' y='40' text-anchor='middle'>description</text>
-  <rect x='215' y='12' width='130' height='46'
-    rx='6' fill='#efe' stroke='#474'/>
-  <text x='280' y='35' text-anchor='middle'>write-skill</text>
-  <text x='280' y='51' text-anchor='middle'
-    font-size='11'>(clarify + gen)</text>
-  <line x1='140' y1='35' x2='213' y2='35'
-    stroke='#666' marker-end='url(#a)'/>
-</svg>
-```
+Add optional self-contained `svg` for architecture, data flow, layouts, or
+structural comparisons. Skip diagrams for yes/no and terminology questions.
+Use light backgrounds, dark strokes/text, explicit question-SVG sizes, and
+bounds that contain every shape. Size boxes to text, stack long labels, keep
+font size at least `11`, and stop arrows before target boxes.
 
 </data-format>
