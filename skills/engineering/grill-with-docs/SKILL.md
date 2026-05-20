@@ -9,6 +9,14 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 
 Ask the questions one at a time, waiting for feedback on each question before continuing.
 
+When the runtime supports structured selectable questions, ask each question with that native tool:
+
+- In Claude Code, use `AskUserQuestion` when available.
+- In Codex, use `request_user_input` when available.
+- If no structured question tool is available, ask the same question in plain text with the recommended answer first and the alternatives listed below it.
+
+Each selectable question should include 2-3 concrete options. Mark the recommended option clearly and explain the trade-off in one sentence.
+
 If a question can be answered by exploring the codebase, explore the codebase instead.
 
 </what-to-do>
