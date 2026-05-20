@@ -34,20 +34,7 @@ The form uses `server.py`, reads `grill-questions.json`, and writes
 
 3. Before telling me anything, start one persistent Monitor on
    `grill-responses.json` mtime. It covers all rounds. Do not use a blocking
-   bash loop or ask me when I am done.
-
-   ```sh
-   cd "<skill-dir>"
-   prev=""
-   while true; do
-     cur=$(stat -f %m grill-responses.json 2>/dev/null ||
-       stat -c %Y grill-responses.json 2>/dev/null)
-     if [ -n "$cur" ] && [ "$cur" != "$prev" ]; then
-       prev=$cur; echo "responses submitted: $(date)"
-     fi
-     sleep 1
-   done
-   ```
+   bash loop or ask me when I am done. Emit an event on every submission.
 
 4. Tell me to answer the page questions and click **Submit responses**.
 
