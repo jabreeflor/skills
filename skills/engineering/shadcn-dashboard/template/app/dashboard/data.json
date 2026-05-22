@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "email": "sarah.johnson@techcorp.com",
+    "plan": "Pro",
+    "signupDate": "2025-04-28",
+    "status": "Active"
+  },
+  {
+    "id": 2,
+    "email": "m.chen@startup.io",
+    "plan": "Starter",
+    "signupDate": "2025-04-27",
+    "status": "Active"
+  },
+  {
+    "id": 3,
+    "email": "alex.rodriguez@agency.co",
+    "plan": "Enterprise",
+    "signupDate": "2025-04-26",
+    "status": "Active"
+  },
+  {
+    "id": 4,
+    "email": "priya.patel@devteam.net",
+    "plan": "Pro",
+    "signupDate": "2025-04-25",
+    "status": "Trial"
+  },
+  {
+    "id": 5,
+    "email": "james.wilson@acmecorp.com",
+    "plan": "Starter",
+    "signupDate": "2025-04-24",
+    "status": "Active"
+  },
+  {
+    "id": 6,
+    "email": "nina.schmidt@ventures.de",
+    "plan": "Enterprise",
+    "signupDate": "2025-04-23",
+    "status": "Active"
+  },
+  {
+    "id": 7,
+    "email": "david.kim@cloudbuilt.io",
+    "plan": "Pro",
+    "signupDate": "2025-04-22",
+    "status": "Churned"
+  },
+  {
+    "id": 8,
+    "email": "emily.nguyen@saasco.com",
+    "plan": "Starter",
+    "signupDate": "2025-04-21",
+    "status": "Trial"
+  }
+]

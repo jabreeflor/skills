@@ -12,167 +12,113 @@ description: >
 
 # shadcn-dashboard
 
-Scaffold a beautiful, production-ready dashboard using [shadcn/ui](https://ui.shadcn.com/blocks) blocks,
-then spin up the dev server so the user can see it live immediately.
+Scaffold a production-ready dashboard by copying the prebuilt template bundled in this skill —
+no network installs needed for the component library.
 
-## What you'll build
+## What's in the template
 
-A Next.js 14+ app (App Router) with:
-- **Sidebar navigation** — collapsible, icon-labeled nav links
-- **Stat cards** — KPI metrics with trend indicators
-- **Chart section** — area or bar chart for trends over time
-- **Data table** — sortable rows with status badges
-- **Responsive layout** — works at all breakpoints
+The `template/` directory (sibling of this SKILL.md) is a complete, buildable Next.js 14+ project
+with the shadcn/ui `dashboard-01` block already installed and wired up:
 
-The default block is `dashboard-01` from shadcn/ui, which gives all of the above in one command.
-You can combine it with `sidebar-07` for a collapsible sidebar.
+| Path | Role |
+|---|---|
+| `components/ui/` | 18 shadcn primitives — sidebar, card, chart, table, badge, etc. |
+| `components/app-sidebar.tsx` | Collapsible sidebar with nav groups |
+| `components/section-cards.tsx` | 4 KPI stat cards with trend indicators |
+| `components/chart-area-interactive.tsx` | Interactive area/bar chart (Recharts) |
+| `components/data-table.tsx` | Sortable table with tabs and status badges |
+| `app/dashboard/page.tsx` | Dashboard layout wiring everything together |
+| `app/layout.tsx`, `globals.css`, config files | Boilerplate — leave as-is |
+
+**You edit 5 files to customize for any domain. Everything else stays untouched.**
 
 ## Step-by-step workflow
 
-### 1. Understand context
+### 1. Determine the domain
 
-Ask (or infer from the conversation) what domain this dashboard is for — e.g., SaaS analytics,
-ecommerce admin, support tickets, finance. This shapes the labels, column names, and colors you'll
-use when customizing the scaffolded code. You don't need to ask explicitly if the user already
-told you.
+From the conversation, identify what kind of dashboard this is (SaaS, ecommerce, support,
+finance, observability, etc.). This drives the labels, columns, and nav items you'll set.
 
-### 2. Check for an existing Next.js project
+### 2. Find the template
 
-Look for a `package.json` with `next` as a dependency in the current directory:
+The template path is `<directory-containing-this-SKILL.md>/template/`. Use the skill file's
+location to resolve it — it's always a sibling directory.
 
+### 3. Copy template to destination
+
+**Starting fresh:**
 ```bash
-cat package.json 2>/dev/null | grep '"next"'
+cp -r <skill-dir>/template <destination-dir>
+cd <destination-dir>
+npm install
 ```
 
-**If found**: use the existing project. Skip to step 4.
-
-**If not found**: scaffold a new one (step 3).
-
-### 3. Scaffold a new Next.js + shadcn/ui project
-
+**Adding to an existing Next.js + Tailwind project:**
 ```bash
-npx create-next-app@latest dashboard-app \
-  --typescript --tailwind --eslint --app --src-dir=false --import-alias="@/*" --yes
-cd dashboard-app
-npx shadcn@latest init --defaults --yes
+cp -r <skill-dir>/template/components <project-root>/
+cp -r <skill-dir>/template/hooks <project-root>/
+cp -r <skill-dir>/template/lib <project-root>/
+cp <skill-dir>/template/components.json <project-root>/
+# Merge these deps into the project's package.json:
+# recharts, @radix-ui/*, lucide-react, class-variance-authority, clsx, tailwind-merge
+npm install
 ```
 
-`cd` into the new directory for all subsequent commands.
+### 4. Customize exactly these 5 files
 
-### 4. Add the dashboard blocks
+The `components/ui/` files are pure primitives — never edit them. Only touch these:
 
-Install the main dashboard block and a collapsible sidebar:
-
-```bash
-npx shadcn@latest add dashboard-01 --yes
-npx shadcn@latest add sidebar-07 --yes 2>/dev/null || true
+#### `components/app-sidebar.tsx`
+Update the app name and `navMain` items array with domain-relevant links:
+```ts
+// Example for ecommerce:
+{ title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+{ title: "Orders",    url: "/orders",    icon: ShoppingCart },
+{ title: "Products",  url: "/products",  icon: Package },
+{ title: "Customers", url: "/customers", icon: Users },
+{ title: "Settings",  url: "/settings",  icon: Settings2 },
 ```
 
-If `dashboard-01` isn't available in the user's shadcn version, fall back to adding the components
-individually:
+#### `components/section-cards.tsx`
+Replace the 4 card blocks with domain KPIs. Each card has a `CardTitle` (metric name),
+a `CardDescription` (current value), and a trend badge. Keep the 4-card grid.
 
-```bash
-npx shadcn@latest add card chart table badge button sidebar --yes
-```
+#### `components/chart-area-interactive.tsx`
+- Update `chartConfig` keys and labels for the domain metrics
+- Replace `chartData` with 6–12 realistic data points
+- Change the `CardTitle` text
 
-### 5. Create the dashboard page
+#### `components/data-table.tsx`
+- Redefine the Zod `schema` with domain-specific fields
+- Update `columns` array (header labels + `accessorKey`)
+- Replace the `data` array with 8–10 realistic sample rows
+- Update tab filter values to match domain status vocabulary
 
-The `dashboard-01` block adds files under `app/dashboard/`. If it created `app/dashboard/page.tsx`,
-you're done with scaffolding — just customize labels.
+#### `app/dashboard/data.json`
+Replace with sample rows matching your updated schema. This feeds the table.
 
-If no page was created, write `app/dashboard/page.tsx` yourself. Use this structure:
-
-```tsx
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DataTable } from "@/components/data-table"
-
-export default function DashboardPage() {
-  return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-16 items-center gap-2 px-4 border-b">
-          <SidebarTrigger />
-          <h1 className="text-lg font-semibold">[Domain] Dashboard</h1>
-        </header>
-        <div className="flex flex-col gap-4 p-4">
-          {/* KPI Stats */}
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {/* stat cards here */}
-          </div>
-          {/* Chart */}
-          <ChartAreaInteractive />
-          {/* Table */}
-          <DataTable />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
-  )
-}
-```
-
-### 6. Customize for the user's domain
-
-Edit the scaffolded files to replace placeholder content with domain-appropriate labels:
-- Sidebar nav items → pages relevant to the domain (e.g., Orders, Customers, Products)
-- KPI card labels → real metrics (e.g., "Total Revenue", "Active Users", "Conversion Rate")
-- Chart title → something meaningful (e.g., "Revenue Over Time", "Daily Active Users")
-- Table columns → relevant fields (e.g., Order ID, Customer, Status, Amount)
-- Table data → 5–8 rows of realistic sample data
-
-Keep the customization focused — update text and data, don't restructure the layout.
-
-### 7. Add a redirect from the root (optional but nice)
-
-If the project has `app/page.tsx`, update it to redirect to the dashboard:
-
-```tsx
-import { redirect } from "next/navigation"
-export default function Home() { redirect("/dashboard") }
-```
-
-### 8. Start the dev server
+### 5. Start the dev server
 
 ```bash
 npm run dev &
-```
-
-Wait a few seconds for it to come up, then open the browser:
-
-```bash
 sleep 4 && open http://localhost:3000
 ```
 
-Tell the user: "Your dashboard is running at http://localhost:3000 — the terminal is still running
-the dev server in the background."
+Tell the user: "Your dashboard is running at http://localhost:3000"
 
-## Handling variations
+## Domain reference
 
-**User wants multiple dashboard styles** (e.g., "make it look like a support dashboard"): Adjust the
-nav items, KPI labels, chart data, and table columns to match. The block structure stays the same.
+| Domain | KPI cards | Chart | Table columns | Nav links |
+|---|---|---|---|---|
+| SaaS | Total Users, MRR, Churn Rate, Active Subs | Revenue over time | Email, Plan, Status, Signup Date | Dashboard, Analytics, Users, Revenue |
+| Ecommerce | Total Revenue, Orders Today, Avg Order Value, Refund Rate | Daily sales | Order ID, Customer, Total, Status | Dashboard, Orders, Products, Customers |
+| Support | Open Tickets, Avg Response Time, CSAT, Resolved Today | Ticket volume | Ticket ID, Customer, Priority, Agent | Dashboard, Tickets, Inbox, Analytics |
+| Finance | Net Revenue, Expenses, Budget Used, Margin | Revenue vs expenses | Transaction, Category, Amount, Date | Dashboard, Transactions, Reports, Budget |
+| Observability | P99 Latency, Error Rate, Uptime, Deploys | Request rate | Service, Status, Latency, Errors | Dashboard, Services, Alerts, Deploys |
 
-**User is in an existing Next.js app without shadcn**: Run `npx shadcn@latest init --defaults --yes`
-first before adding blocks.
+## Tips
 
-**shadcn blocks CLI not available** (older version): Install components individually with
-`npx shadcn@latest add card chart table badge button sidebar` then write the page manually using
-the template in step 5.
-
-**User wants charts**: The `chart-area-interactive` component from `dashboard-01` uses Recharts
-under the hood (included via shadcn). No extra install needed.
-
-**Port 3000 already in use**: Run `npm run dev -- --port 3001` and open `http://localhost:3001`.
-
-## Reference: efferd.com dashboard archetypes
-
-For inspiration on what to put in the dashboard for different domains, refer to these patterns:
-- **SaaS/Analytics**: visitor metrics, active users, top pages, conversion funnels
-- **Ecommerce**: revenue trends, refund rates, category rankings, recent orders
-- **Finance**: KPI stats, budget vs actuals, expense breakdowns
-- **Support/CRM**: ticket volume, CSAT scores, team availability, response times
-- **Observability**: latency cards, error rates, deployment tracking, uptime sparklines
-
-Pick the closest archetype to what the user described and use it to drive your label/data choices.
+- Port 3000 taken? `npm run dev -- --port 3001` and open `http://localhost:3001`
+- The chart uses Recharts (already in `package.json`) — no extra install needed
+- For an existing project with its own shadcn setup, check `components.json` for alias
+  conflicts before copying `components/ui/`
